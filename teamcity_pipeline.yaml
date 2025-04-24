@@ -1,0 +1,27 @@
+yaml
+CopyEdit
+version: '1.0'
+
+build:
+  steps:
+    - name: Checkout Code
+      script:
+        - git clone https://bitbucket.org/myrepo/scalexecutor.git
+
+    - name: Validate Shell Scripts
+      script:
+        - shellcheck scripts/*.sh
+
+    - name: Validate PL/SQL Syntax
+      script:
+        - sqlplus -s test_user/test_pass@ORCL @plsql/thread_processor_pkg.sql
+
+    - name: Package for UDeploy
+      script:
+        - tar -czf scalexecutor_package.tar.gz scripts/ plsql/
+
+deploy:
+  udeploy:
+    environment: PROD
+    app: ScaleXecutor
+    artifact: scalexecutor_package.tar.gz
